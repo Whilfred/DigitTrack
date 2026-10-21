@@ -10,7 +10,7 @@ export async function GET(_req, { params }) {
   const id = params.id
   if (!isUuid(id)) return NextResponse.json({ error: 'Étudiant introuvable.' }, { status: 404 })
   try {
-    const [u, p, rev, ads, calls, months, enr, prog] = await Promise.all([
+    const [u, p, rev, ads, calls, months, enr, prog, xp] = await Promise.all([
       query('SELECT id, full_name AS name, email, phone, role, is_active, created_at FROM users WHERE id = $1', [id]),
       query('SELECT niche, product, goal_xof AS goal, status, notes FROM student_profiles WHERE user_id = $1', [id]),
       query(`SELECT id, amount_xof AS amount, source, note, to_char(earned_on, 'YYYY-MM-DD') AS date
@@ -19,29 +19,33 @@ export async function GET(_req, { params }) {
                FROM ad_spends WHERE user_id = $1 ORDER BY spent_on DESC, id DESC`, [id]),
       query(`SELECT id, scheduled_at, duration_minutes AS duration, topic, meeting_url, status, notes
                FROM calls WHERE user_id = $1 ORDER BY scheduled_at DESC`, [id]),
-      query(`SELECT to_char(d, 'YYYY-MM') AS month, SUM(rev)::bigint AS revenue, SUM(spend)::bigint AS spend FROM (
-               SELECT earned_on d, amount_xof rev, 0 spend FROM student_revenues WHERE user_id = $1
+      query(`SELECT to_char(d, 'YYYY-MM') AS month, SUM(rev)::bigint AS revenue, SUM(spend)::bigint AS spend, SUM(exp)::bigint AS expenses FROM (
+               SELECT earned_on d, amount_xof rev, 0 spend, 0 exp FROM student_revenues WHERE user_id = $1
                UNION ALL
-               SELECT spent_on, 0, amount_xof FROM ad_spends WHERE user_id = $1) t
+               SELECT spent_on, 0, amount_xof, 0 FROM ad_spends WHERE user_id = $1
+               UNION ALL
+               SELECT spent_on, 0, 0, amount_xof FROM student_expenses WHERE user_id = $1) t
               GROUP BY 1 ORDER BY 1 DESC`, [id]),
       query(`SELECT f.title, e.status, e.enrolled_at FROM enrollments e
                JOIN formations f ON f.id = e.formation_id WHERE e.user_id = $1 ORDER BY e.enrolled_at DESC`, [id]),
       query(`SELECT (SELECT COUNT(*) FROM lesson_progress WHERE user_id = $1 AND completed)::int AS done,
                     (SELECT COUNT(*) FROM lessons)::int AS total`, [id]),
+      query('SELECT COALESCE(SUM(amount_xof), 0)::bigint AS total FROM student_expenses WHERE user_id = $1', [id]),
     ])
     if (!u.rows[0]) return NextResponse.json({ error: 'Étudiant introuvable.' }, { status: 404 })
     const revenue = rev.rows.reduce((s, r) => s + r.amount, 0)
     const spend = ads.rows.reduce((s, r) => s + r.amount, 0)
+    const expenses = Number(xp.rows[0].total)
     return NextResponse.json({
       student: u.rows[0],
       profile: p.rows[0] || { niche: '', product: '', goal: 0, status: 'actif', notes: '' },
       revenues: rev.rows,
       spends: ads.rows,
       calls: calls.rows,
-      months: months.rows.map((m) => ({ month: m.month, revenue: Number(m.revenue), spend: Number(m.spend), profit: Number(m.revenue) - Number(m.spend) })),
+      months: months.rows.map((m) => ({ month: m.month, revenue: Number(m.revenue), spend: Number(m.spend), expenses: Number(m.expenses), profit: Number(m.revenue) - Number(m.spend) - Number(m.expenses) })),
       enrollments: enr.rows,
       progress: prog.rows[0],
-      totals: { revenue, spend, profit: revenue - spend },
+      totals: { revenue, spend, expenses, profit: revenue - spend - expenses },
     })
   } catch (e) {
     console.error('[admin/etudiant]', e)
