@@ -1,11 +1,12 @@
 /* =====================================================
-   Mon espace — style « fenêtre d'app » (menu à gauche)
+   Mon espace — PLEIN ÉCRAN (menu à gauche)
    À COLLER à la place de l'ancien bloc "Mon espace" dans global.css
    (mêmes classes, aucune modif de JSX)
+   Hauteur du header : 98px (modifier --hdr si besoin)
    ===================================================== */
 
-/* Page : bandeau bleu en haut + fond clair, sans vidéo */
-body:has(.esp){background:linear-gradient(180deg,#1457f0 0,#0b2fa0 330px,#f4f7ff 330px) no-repeat,#f4f7ff}
+/* Page : fond uni, sans vidéo */
+body:has(.esp){background:#fff}
 body:has(.esp) .bg{display:none}
 
 /* Dans l'espace : plus de liens Accueil / À propos… ni de footer */
@@ -15,37 +16,25 @@ body:has(.esp) header.top{grid-template-columns:1fr auto}
 
 /* (Le header bleu vient déjà de global.css : on n'y touche pas) */
 
-/* ---------- La fenêtre ---------- */
+/* ---------- La zone plein écran ---------- */
 .esp{
+  --hdr:98px;
   --ink:#071436;--soft:#4b5d84;--mute:#7587a8;
   --glass:#eef3ff;--glass-strong:#dbe9ff;--edge:rgba(10,40,120,.12);
   --ice:#f4f7ff;--royal:#0a3bd1;--ease:cubic-bezier(.2,.8,.2,1);
   --rev:var(--blue2);--cost:#f5a524;
   color:var(--ink);
   position:relative;
-  width:calc(100% - 2*clamp(14px,3vw,32px));max-width:1240px;margin:104px auto 48px;padding:52px 0 0;
-  min-height:calc(100vh - 150px);
-  display:grid;grid-template-columns:250px minmax(0,1fr);gap:0;align-items:start;
+  width:100%;max-width:none;margin:0;padding:var(--hdr) 0 0;
+  min-height:100vh;
+  display:grid;grid-template-columns:260px minmax(0,1fr);gap:0;align-items:start;
   background:
-    radial-gradient(circle at 24px 26px,#cfdaf3 0 5.5px,transparent 6px),
-    radial-gradient(circle at 42px 26px,#cfdaf3 0 5.5px,transparent 6px),
-    radial-gradient(circle at 60px 26px,#cfdaf3 0 5.5px,transparent 6px),
-    linear-gradient(var(--edge),var(--edge)) 0 51px/100% 1px,
-    linear-gradient(#f4f7ff,#f4f7ff) 0 0/100% 52px,
-    linear-gradient(var(--edge),var(--edge)) 249px 52px/1px calc(100% - 52px),
-    linear-gradient(#fafcff,#fafcff) 0 52px/250px calc(100% - 52px),
+    linear-gradient(var(--edge),var(--edge)) 259px 0/1px 100% no-repeat,
+    linear-gradient(#fafcff,#fafcff) 0 0/260px 100% no-repeat,
     #fff;
-  background-repeat:no-repeat;
-  border:1px solid rgba(255,255,255,.85);border-radius:30px;overflow:clip;
-  box-shadow:0 50px 120px rgba(3,20,90,.35),0 20px 40px rgba(3,20,90,.12);
-  animation:espWin 1s var(--ease) both}
-@keyframes espWin{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
-/* Pastille titre de la fenêtre */
-.esp::before{content:"Mon espace";position:absolute;top:12px;left:50%;transform:translateX(-50%);
-  padding:5px 26px;border-radius:999px;background:#fff;border:1px solid var(--edge);
-  color:var(--mute);font-size:.74rem;font-weight:600;pointer-events:none}
+  border:0;border-radius:0;box-shadow:none;overflow:visible}
 
-.esp-main{grid-column:2;grid-row:1;display:grid;gap:18px;min-width:0;align-self:start;padding:30px clamp(18px,3vw,34px) 36px}
+.esp-main{grid-column:2;grid-row:1;display:grid;gap:18px;min-width:0;align-self:start;padding:34px clamp(20px,4vw,56px) 48px}
 .esp h2{font-size:clamp(1.8rem,3.2vw,2.6rem);font-weight:700;letter-spacing:-.045em;color:var(--ink);line-height:1.05}
 .esp h3{font-size:1.05rem;font-weight:700;margin-bottom:12px;letter-spacing:-.01em;color:var(--ink)}
 .esp-mute,.esp small{color:var(--mute)}
@@ -57,14 +46,14 @@ body:has(.esp) header.top{grid-template-columns:1fr auto}
 
 /* Entrée animée du contenu */
 .esp-main>*{animation:espRise .85s var(--ease) both}
-.esp-main>*:nth-child(1){animation-delay:.25s}.esp-main>*:nth-child(2){animation-delay:.33s}.esp-main>*:nth-child(3){animation-delay:.41s}
-.esp-main>*:nth-child(4){animation-delay:.49s}.esp-main>*:nth-child(5){animation-delay:.57s}.esp-main>*:nth-child(n+6){animation-delay:.65s}
+.esp-main>*:nth-child(1){animation-delay:.1s}.esp-main>*:nth-child(2){animation-delay:.18s}.esp-main>*:nth-child(3){animation-delay:.26s}
+.esp-main>*:nth-child(4){animation-delay:.34s}.esp-main>*:nth-child(5){animation-delay:.42s}.esp-main>*:nth-child(n+6){animation-delay:.5s}
 .esp-rail>*{animation:espSlide .8s var(--ease) both}
 .esp-rail>*:nth-child(2){animation-delay:.2s}.esp-rail>*:nth-child(3){animation-delay:.3s}
 @keyframes espRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
 @keyframes espSlide{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 
-/* Cartes = panneaux de l'aperçu (fond glacé + bord fin) */
+/* Cartes (fond glacé + bord fin) */
 .esp .glass{background:var(--ice);border:1px solid var(--edge);border-radius:22px;color:var(--ink);
   backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;
   transition:box-shadow .35s var(--ease),border-color .35s,background .35s}
@@ -79,8 +68,8 @@ body:has(.esp) header.top{grid-template-columns:1fr auto}
   box-shadow:0 10px 28px rgba(31,107,255,.45),inset 0 1px 0 rgba(255,255,255,.35)}
 .esp .btn-blue:hover{transform:translateY(-2px);box-shadow:0 16px 38px rgba(31,107,255,.6),inset 0 1px 0 rgba(255,255,255,.35)}
 
-/* ---------- Menu à GAUCHE ---------- */
-.esp-rail{grid-column:1;grid-row:1;position:sticky;top:92px;align-self:start;display:grid;gap:12px;padding:22px 14px 24px}
+/* ---------- Menu à GAUCHE (collé sous le header, pleine hauteur) ---------- */
+.esp-rail{grid-column:1;grid-row:1;position:sticky;top:var(--hdr);align-self:start;display:grid;gap:12px;padding:26px 14px 24px}
 .esp-rail::before{content:"W";display:grid;place-items:center;width:38px;height:38px;margin:0 0 10px 6px;border-radius:12px;
   background:linear-gradient(135deg,var(--blue2),var(--royal));color:#fff;font-weight:800;
   box-shadow:0 10px 24px rgba(31,107,255,.4),inset 0 1px 0 rgba(255,255,255,.4)}
@@ -231,15 +220,7 @@ body:has(.esp) header.top{grid-template-columns:1fr auto}
 
 /* ---------- Tablette et mobile : menu en bandeau horizontal ---------- */
 @media(max-width:980px){
-  .esp{grid-template-columns:minmax(0,1fr);margin-top:92px;border-radius:24px;
-    background:
-      radial-gradient(circle at 24px 26px,#cfdaf3 0 5.5px,transparent 6px),
-      radial-gradient(circle at 42px 26px,#cfdaf3 0 5.5px,transparent 6px),
-      radial-gradient(circle at 60px 26px,#cfdaf3 0 5.5px,transparent 6px),
-      linear-gradient(var(--edge),var(--edge)) 0 51px/100% 1px,
-      linear-gradient(#f4f7ff,#f4f7ff) 0 0/100% 52px,
-      #fff;
-    background-repeat:no-repeat}
+  .esp{grid-template-columns:minmax(0,1fr);padding-top:84px;background:#fff}
   .esp-rail{position:static;order:-1;padding:12px 12px 0;gap:0}
   .esp-rail::before{display:none}
   .esp .esp-rail .esp-id{display:none}
@@ -263,11 +244,17 @@ body:has(.esp) header.top{grid-template-columns:1fr auto}
 }
 
 /* ===== Garde-fou : passe devant `main>section:not(.motion-hero):not(.hero)` de global.css =====
-   (cette règle ajoutait ~85px de padding de chaque côté et 150px en haut) */
-.esp.esp.esp{max-width:1240px;margin:104px auto 48px;padding:52px 0 0;gap:0;grid-template-columns:250px minmax(0,1fr);justify-content:stretch;color:var(--ink)}
+   (cette règle ajoutait du padding de chaque côté et 150px en haut) */
+.esp.esp.esp.esp{
+  width:100%;max-width:none;margin:0;
+  padding:var(--hdr) 0 0;gap:0;
+  min-height:100vh;
+  border:0;border-radius:0;box-shadow:none;overflow:visible;
+  grid-template-columns:260px minmax(0,1fr);justify-content:stretch;color:var(--ink)}
 .esp .esp-rail{grid-column:1;grid-row:1;margin:0}
 .esp .esp-main{grid-column:2;grid-row:1;margin:0}
 @media(max-width:980px){
-  .esp.esp.esp{margin-top:92px;grid-template-columns:minmax(0,1fr)}
+  .esp.esp.esp.esp{padding-top:84px;grid-template-columns:minmax(0,1fr);background:#fff}
+  .esp .esp-rail{top:auto}
   .esp .esp-main{grid-column:1;grid-row:2}
 }
